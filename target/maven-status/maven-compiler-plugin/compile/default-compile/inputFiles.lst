@@ -12,6 +12,7 @@
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByInvoiceNumberQueryHandler.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/Query.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/query/invoice/GetAllInvoicesQuery.java
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/response/PaymentInfoDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/command/invoice/CreateInvoiceCommand.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/model/Invoice.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/mapper/LineItemMapper.java

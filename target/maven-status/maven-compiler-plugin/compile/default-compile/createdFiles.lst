@@ -3,7 +3,6 @@ com/example/invoicesbackend/repository/InvoiceRepository.class
 com/example/invoicesbackend/dto/response/InvoiceResponseDto.class
 com/example/invoicesbackend/cqrs/QueryHandler.class
 com/example/invoicesbackend/dto/request/PaymentRequestDto.class
-com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByIdQuery.class
 com/example/invoicesbackend/service/InvoiceService.class
 com/example/invoicesbackend/dto/response/LineItemResponseDto.class
 com/example/invoicesbackend/mapper/InvoiceMapper.class
@@ -13,6 +12,7 @@ com/example/invoicesbackend/model/Invoice.class
 com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByInvoiceNumberQueryHandler.class
 com/example/invoicesbackend/repository/PaymentRepository.class
 com/example/invoicesbackend/cqrs/Command.class
+com/example/invoicesbackend/dto/response/PaymentInfoDto.class
 com/example/invoicesbackend/cqrs/command/invoice/PayInvoiceCommand.class
 com/example/invoicesbackend/mapper/LineItemMapperImpl.class
 com/example/invoicesbackend/cqrs/query/invoice/GetAllInvoicesQuery.class
@@ -34,5 +34,4 @@ com/example/invoicesbackend/cqrs/command/invoice/UpdateInvoiceCommand.class
 com/example/invoicesbackend/InvoicesBackendApplication.class
 com/example/invoicesbackend/mapper/InvoiceMapperImpl.class
 com/example/invoicesbackend/dto/request/InvoiceRequestDto.class
-com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByIdQueryHandler.class
 com/example/invoicesbackend/cqrs/command/invoice/CreateInvoiceCommandHandler.class

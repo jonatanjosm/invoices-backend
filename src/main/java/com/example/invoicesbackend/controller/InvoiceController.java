@@ -31,11 +31,6 @@ public class InvoiceController {
         return new ResponseEntity<>(invoices, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<InvoiceResponseDto> getInvoiceById(@PathVariable Long id) {
-        InvoiceResponseDto invoice = invoiceService.getInvoiceById(id);
-        return new ResponseEntity<>(invoice, HttpStatus.OK);
-    }
 
     @GetMapping("/number/{invoiceNumber}")
     public ResponseEntity<InvoiceResponseDto> getInvoiceByInvoiceNumber(@PathVariable String invoiceNumber) {
