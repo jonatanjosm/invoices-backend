@@ -29,7 +29,6 @@
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/request/InvoiceRequestDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/repository/PaymentRepository.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/model/LineItem.java
-/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/config/DataLoader.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/response/LineItemResponseDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/request/PaymentRequestDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/repository/LineItemRepository.java

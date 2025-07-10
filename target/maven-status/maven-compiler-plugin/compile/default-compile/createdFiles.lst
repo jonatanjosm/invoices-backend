@@ -24,7 +24,6 @@ com/example/invoicesbackend/model/Invoice$InvoiceStatus.class
 com/example/invoicesbackend/cqrs/command/invoice/CreateInvoiceCommand.class
 com/example/invoicesbackend/cqrs/Query.class
 com/example/invoicesbackend/exception/GlobalExceptionHandler.class
-com/example/invoicesbackend/config/DataLoader.class
 com/example/invoicesbackend/controller/InvoiceController.class
 com/example/invoicesbackend/model/LineItem.class
 com/example/invoicesbackend/exception/GlobalExceptionHandler$ErrorResponse.class

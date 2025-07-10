@@ -56,16 +56,18 @@ public class UpdateInvoiceCommandHandler implements CommandHandler<UpdateInvoice
                   "Invoice with number " + command.getUpdateInvoiceRequestDto().getInvoiceNumber() + " has been already paid");
         }
 
-        List<LineItem> items = invoice.getLineItems();
-        List<LineItem> savedItems = saveItems(command.getUpdateInvoiceRequestDto().getLineItems(), invoice);
-        items.addAll(savedItems);
+        // Add the new line items to the invoice
+        addItemsToInvoice(command.getUpdateInvoiceRequestDto().getLineItems(), invoice);
 
-        invoice.setLineItems(items);
+        // Calculate the total amount
+        invoice.calculateAmount();
 
-        invoice.setAmount(calculateTotalAmount(items.stream().map(LineItemMapper.INSTANCE::toDto).collect(Collectors.toList())));
-
+        // Save the invoice
         Invoice updatedInvoice = invoiceRepository.save(invoice);
-        return invoiceMapper.toDto(updatedInvoice);
+
+        // Create a fresh DTO from the updated invoice to avoid duplication
+        InvoiceResponseDto responseDto = invoiceMapper.toDto(updatedInvoice);
+        return responseDto;
     }
 
     private BigDecimal calculateTotalAmount(List<LineItemRequestDto> items) {
@@ -76,11 +78,18 @@ public class UpdateInvoiceCommandHandler implements CommandHandler<UpdateInvoice
         return totalAmount;
     }
 
-    private List<LineItem> saveItems(List<LineItemRequestDto> items, Invoice invoice) {
-        return items.stream().map(lineItemDto -> {
+    private void addItemsToInvoice(List<LineItemRequestDto> items, Invoice invoice) {
+        // Create LineItem entities without saving them
+        List<LineItem> lineItems = items.stream().map(lineItemDto -> {
             LineItem lineItem = LineItemMapper.INSTANCE.toEntity(lineItemDto);
-            lineItem.setInvoice(invoice);
-            return lineItemRepository.save(lineItem);
+            lineItem.calculateTotalAmount(); // Ensure totalAmount is calculated
+            invoice.addLineItem(lineItem); // This sets up the bidirectional relationship
+            return lineItem;
         }).collect(Collectors.toList());
+
+        // Save all entities in a single operation
+        if (!lineItems.isEmpty()) {
+            lineItemRepository.saveAll(lineItems);
+        }
     }
 }
