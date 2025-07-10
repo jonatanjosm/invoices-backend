@@ -212,6 +212,14 @@ docker-compose logs -f
 docker-compose down
 ```
 
+## Database Migrations
+
+The application uses Flyway for database schema migrations:
+
+- Migration scripts are located in `src/main/resources/db/migration`
+- The initial schema is defined in `V1__Initial_schema.sql`
+- To add new database changes, create a new migration script following the naming convention `V{number}__{description}.sql`
+
 ## Testing
 
 The application includes comprehensive tests for all layers:
