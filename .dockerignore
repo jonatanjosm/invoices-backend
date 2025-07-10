@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Maven
+target/
+!target/invoices-backend-0.0.1-SNAPSHOT.jar
+*.class
+*.jar
+!target/invoices-backend-0.0.1-SNAPSHOT.jar
+*.war
+*.ear
+*.logs
+*.iml
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Logs
+logs/
+*.log

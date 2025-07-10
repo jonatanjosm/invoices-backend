@@ -50,12 +50,6 @@ public class InvoiceController {
         return new ResponseEntity<>(updatedInvoice, HttpStatus.OK);
     }
 
-    /**
-     * Pay an invoice.
-     * 
-     * @param paymentRequestDto The payment request DTO
-     * @return The updated invoice response DTO
-     */
     @PostMapping("/pay")
     public ResponseEntity<InvoiceResponseDto> payInvoice(@Valid @RequestBody PaymentRequestDto paymentRequestDto) {
         InvoiceResponseDto paidInvoice = invoiceService.payInvoice(paymentRequestDto);

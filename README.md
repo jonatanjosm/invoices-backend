@@ -6,8 +6,9 @@ A Spring Boot application for managing invoices with CRUD operations (excluding 
 
 - Create new invoices
 - Retrieve all invoices
-- Retrieve a specific invoice by ID or invoice number
+- Retrieve a specific invoice by invoice number
 - Update existing invoices
+- Pay invoices
 
 ## Technologies Used
 
@@ -21,10 +22,19 @@ A Spring Boot application for managing invoices with CRUD operations (excluding 
 
 ### Prerequisites
 
+Choose one of the following options:
+
+#### Option 1: Local Development
 - Java 11 or higher
 - Maven
 
+#### Option 2: Docker
+- Docker
+- Docker Compose
+
 ### Running the Application
+
+#### Option 1: Local Development
 
 1. Clone the repository
 2. Navigate to the project directory
@@ -34,7 +44,23 @@ A Spring Boot application for managing invoices with CRUD operations (excluding 
 mvn spring-boot:run
 ```
 
-The application will start on port 8080.
+#### Option 2: Docker
+
+1. Clone the repository
+2. Navigate to the project directory
+3. Build and run the application using Docker Compose:
+
+```bash
+docker-compose up -d
+```
+
+To stop the application:
+
+```bash
+docker-compose down
+```
+
+The application will start on port 8080 in both options.
 
 ### H2 Database Console
 
@@ -55,12 +81,6 @@ Use the following credentials:
 
 ```
 GET /api/invoices
-```
-
-### Get Invoice by ID
-
-```
-GET /api/invoices/{id}
 ```
 
 ### Get Invoice by Invoice Number
@@ -90,18 +110,36 @@ Request Body:
 ### Update Invoice
 
 ```
-PUT /api/invoices/{id}
+PUT /api/invoices
 ```
 
 Request Body:
 ```json
 {
   "invoiceNumber": "INV-004",
-  "customerName": "Updated Customer",
-  "invoiceDate": "2023-01-01",
-  "amount": 1500.00,
-  "description": "Updated invoice",
-  "status": "PAID"
+  "lineItems": [
+    {
+      "description": "New Item",
+      "price": 75.00,
+      "quantity": 2
+    }
+  ]
+}
+```
+
+### Pay Invoice
+
+```
+POST /api/invoices/pay
+```
+
+Request Body:
+```json
+{
+  "invoiceNumber": "INV-001",
+  "paymentDate": "2023-01-15",
+  "amount": 100.00,
+  "paymentMethod": "Credit Card"
 }
 ```
 
@@ -123,14 +161,6 @@ A Postman collection is included in the project for easy testing of the API endp
 2. The collection uses the variable `{{base_url}}` which is set to `http://localhost:8080` by default
 3. You can change this value in the environment settings if your application is running on a different host or port
 
-## Sample Data
-
-The application is pre-loaded with sample data for testing purposes:
-
-1. Invoice Number: INV-001, Customer: Acme Corporation, Status: PENDING
-2. Invoice Number: INV-002, Customer: Globex Inc., Status: PAID
-3. Invoice Number: INV-003, Customer: Wayne Enterprises, Status: PENDING
-
 ## Error Handling
 
 The application includes comprehensive error handling:
@@ -139,6 +169,49 @@ The application includes comprehensive error handling:
 - 400 Bad Request: For validation errors or when trying to create an invoice with a duplicate invoice number
 - 500 Internal Server Error: For unexpected server errors
 
+## Docker Configuration
+
+The application can be run in a Docker container using the provided Dockerfile and docker-compose.yml files.
+
+### Dockerfile
+
+The Dockerfile uses a multi-stage build approach:
+1. First stage: Uses eclipse-temurin:11-jdk to build the application
+2. Second stage: Uses eclipse-temurin:11-jre (smaller image) to run the application
+
+### Docker Compose
+
+The docker-compose.yml file configures:
+- Port mapping: Maps host port 8080 to container port 8080
+- Environment variables: Sets the Spring profile to 'default'
+- Restart policy: Ensures the container restarts if it crashes
+- Health check: Monitors the application health by checking the /api/invoices endpoint
+
+### Building and Running with Docker
+
+To build and run the application with Docker:
+
+```bash
+# Build the Docker image
+docker build -t invoices-backend .
+
+# Run the container
+docker run -p 8080:8080 invoices-backend
+```
+
+Or using Docker Compose:
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the application
+docker-compose down
+```
+
 ## Testing
 
 The application includes comprehensive tests for all layers:
@@ -146,12 +219,18 @@ The application includes comprehensive tests for all layers:
 ### Unit Tests
 
 - **Controller Tests**: Test the REST endpoints in isolation by mocking the service layer
-- **Service Tests**: Test the service layer in isolation by mocking the repository layer
-- **Repository Tests**: Test the repository layer using an in-memory H2 database
+  - Each endpoint has tests for both success and error scenarios
+  - Success tests verify correct response status and data
+  - Error tests verify appropriate error handling and status codes
 
 ### Integration Tests
 
 - Test the full API flow from HTTP request to database and back
+- Covers the entire invoice lifecycle:
+  1. Creating an invoice with line items
+  2. Retrieving the invoice by invoice number
+  3. Updating the invoice with new line items
+  4. Paying the invoice
 
 ### Running Tests
 
@@ -170,5 +249,5 @@ mvn test -Dtest=InvoiceControllerTest
 To run a specific test method:
 
 ```bash
-mvn test -Dtest=InvoiceControllerTest#getAllInvoices_ShouldReturnAllInvoices
+mvn test -Dtest=InvoiceControllerTest#testGetAllInvoices_Success
 ```
