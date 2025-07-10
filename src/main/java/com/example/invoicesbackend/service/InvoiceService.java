@@ -1,5 +1,8 @@
 package com.example.invoicesbackend.service;
 
+import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
+import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
+import com.example.invoicesbackend.mapper.InvoiceMapper;
 import com.example.invoicesbackend.model.Invoice;
 import com.example.invoicesbackend.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,50 +15,52 @@ import java.util.List;
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceMapper invoiceMapper;
 
     @Autowired
-    public InvoiceService(InvoiceRepository invoiceRepository) {
+    public InvoiceService(InvoiceRepository invoiceRepository, InvoiceMapper invoiceMapper) {
         this.invoiceRepository = invoiceRepository;
+        this.invoiceMapper = invoiceMapper;
     }
 
-    public List<Invoice> getAllInvoices() {
-        return invoiceRepository.findAll();
+    public List<InvoiceResponseDto> getAllInvoices() {
+        List<Invoice> invoices = invoiceRepository.findAll();
+        return invoiceMapper.toDtoList(invoices);
     }
 
-    public Invoice getInvoiceById(Long id) {
-        return invoiceRepository.findById(id)
+    public InvoiceResponseDto getInvoiceById(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Invoice not found with id: " + id));
+        return invoiceMapper.toDto(invoice);
     }
 
-    public Invoice getInvoiceByInvoiceNumber(String invoiceNumber) {
-        return invoiceRepository.findByInvoiceNumber(invoiceNumber)
+    public InvoiceResponseDto getInvoiceByInvoiceNumber(String invoiceNumber) {
+        Invoice invoice = invoiceRepository.findByInvoiceNumber(invoiceNumber)
                 .orElseThrow(() -> new EntityNotFoundException("Invoice not found with invoice number: " + invoiceNumber));
+        return invoiceMapper.toDto(invoice);
     }
 
-    public Invoice createInvoice(Invoice invoice) {
-        if (invoiceRepository.existsByInvoiceNumber(invoice.getInvoiceNumber())) {
-            throw new IllegalArgumentException("Invoice with number " + invoice.getInvoiceNumber() + " already exists");
+    public InvoiceResponseDto createInvoice(InvoiceRequestDto invoiceRequestDto) {
+        if (invoiceRepository.existsByInvoiceNumber(invoiceRequestDto.getInvoiceNumber())) {
+            throw new IllegalArgumentException("Invoice with number " + invoiceRequestDto.getInvoiceNumber() + " already exists");
         }
-        return invoiceRepository.save(invoice);
+        Invoice invoice = invoiceMapper.toEntity(invoiceRequestDto);
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+        return invoiceMapper.toDto(savedInvoice);
     }
 
-    public Invoice updateInvoice(Long id, Invoice invoiceDetails) {
-        Invoice invoice = getInvoiceById(id);
-        
+    public InvoiceResponseDto updateInvoice(Long id, InvoiceRequestDto invoiceRequestDto) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Invoice not found with id: " + id));
+
         // Only update if the invoice number is not changed or the new invoice number doesn't exist
-        if (!invoice.getInvoiceNumber().equals(invoiceDetails.getInvoiceNumber()) && 
-            invoiceRepository.existsByInvoiceNumber(invoiceDetails.getInvoiceNumber())) {
-            throw new IllegalArgumentException("Invoice with number " + invoiceDetails.getInvoiceNumber() + " already exists");
+        if (!invoice.getInvoiceNumber().equals(invoiceRequestDto.getInvoiceNumber()) && 
+            invoiceRepository.existsByInvoiceNumber(invoiceRequestDto.getInvoiceNumber())) {
+            throw new IllegalArgumentException("Invoice with number " + invoiceRequestDto.getInvoiceNumber() + " already exists");
         }
-        
-        invoice.setInvoiceNumber(invoiceDetails.getInvoiceNumber());
-        invoice.setCustomerName(invoiceDetails.getCustomerName());
-        invoice.setInvoiceDate(invoiceDetails.getInvoiceDate());
-        invoice.setDueDate(invoiceDetails.getDueDate());
-        invoice.setAmount(invoiceDetails.getAmount());
-        invoice.setDescription(invoiceDetails.getDescription());
-        invoice.setStatus(invoiceDetails.getStatus());
-        
-        return invoiceRepository.save(invoice);
+
+        invoiceMapper.updateEntityFromDto(invoiceRequestDto, invoice);
+        Invoice updatedInvoice = invoiceRepository.save(invoice);
+        return invoiceMapper.toDto(updatedInvoice);
     }
 }

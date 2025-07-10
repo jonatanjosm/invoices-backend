@@ -1,5 +1,8 @@
 package com.example.invoicesbackend.service;
 
+import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
+import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
+import com.example.invoicesbackend.mapper.InvoiceMapper;
 import com.example.invoicesbackend.model.Invoice;
 import com.example.invoicesbackend.repository.InvoiceRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +26,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class InvoiceServiceTest {
 
-    @Mock
+    @Mock(lenient = true)
     private InvoiceRepository invoiceRepository;
+
+    @Mock(lenient = true)
+    private InvoiceMapper invoiceMapper;
 
     @InjectMocks
     private InvoiceService invoiceService;
@@ -32,6 +38,10 @@ public class InvoiceServiceTest {
     private Invoice testInvoice1;
     private Invoice testInvoice2;
     private List<Invoice> allInvoices;
+
+    private InvoiceResponseDto testInvoiceResponseDto1;
+    private InvoiceResponseDto testInvoiceResponseDto2;
+    private List<InvoiceResponseDto> allInvoiceResponseDtos;
 
     @BeforeEach
     void setUp() {
@@ -56,30 +66,59 @@ public class InvoiceServiceTest {
         testInvoice2.setStatus(Invoice.InvoiceStatus.PAID);
 
         allInvoices = Arrays.asList(testInvoice1, testInvoice2);
+
+        testInvoiceResponseDto1 = new InvoiceResponseDto();
+        testInvoiceResponseDto1.setId(1L);
+        testInvoiceResponseDto1.setInvoiceNumber("INV-001");
+        testInvoiceResponseDto1.setCustomerName("Test Customer 1");
+        testInvoiceResponseDto1.setInvoiceDate(LocalDate.of(2023, 1, 1));
+        testInvoiceResponseDto1.setDueDate(LocalDate.of(2023, 1, 31));
+        testInvoiceResponseDto1.setAmount(new BigDecimal("1000.00"));
+        testInvoiceResponseDto1.setDescription("Test Invoice 1");
+        testInvoiceResponseDto1.setStatus(Invoice.InvoiceStatus.PENDING);
+
+        testInvoiceResponseDto2 = new InvoiceResponseDto();
+        testInvoiceResponseDto2.setId(2L);
+        testInvoiceResponseDto2.setInvoiceNumber("INV-002");
+        testInvoiceResponseDto2.setCustomerName("Test Customer 2");
+        testInvoiceResponseDto2.setInvoiceDate(LocalDate.of(2023, 2, 1));
+        testInvoiceResponseDto2.setDueDate(LocalDate.of(2023, 2, 28));
+        testInvoiceResponseDto2.setAmount(new BigDecimal("2000.00"));
+        testInvoiceResponseDto2.setDescription("Test Invoice 2");
+        testInvoiceResponseDto2.setStatus(Invoice.InvoiceStatus.PAID);
+
+        allInvoiceResponseDtos = Arrays.asList(testInvoiceResponseDto1, testInvoiceResponseDto2);
+
+        // Setup mapper mocks
+        when(invoiceMapper.toDto(testInvoice1)).thenReturn(testInvoiceResponseDto1);
+        when(invoiceMapper.toDto(testInvoice2)).thenReturn(testInvoiceResponseDto2);
+        when(invoiceMapper.toDtoList(allInvoices)).thenReturn(allInvoiceResponseDtos);
     }
 
     @Test
     void getAllInvoices_ShouldReturnAllInvoices() {
         when(invoiceRepository.findAll()).thenReturn(allInvoices);
 
-        List<Invoice> result = invoiceService.getAllInvoices();
+        List<InvoiceResponseDto> result = invoiceService.getAllInvoices();
 
         assertEquals(2, result.size());
         assertEquals("INV-001", result.get(0).getInvoiceNumber());
         assertEquals("INV-002", result.get(1).getInvoiceNumber());
         verify(invoiceRepository, times(1)).findAll();
+        verify(invoiceMapper, times(1)).toDtoList(allInvoices);
     }
 
     @Test
     void getInvoiceById_WhenInvoiceExists_ShouldReturnInvoice() {
         when(invoiceRepository.findById(1L)).thenReturn(Optional.of(testInvoice1));
 
-        Invoice result = invoiceService.getInvoiceById(1L);
+        InvoiceResponseDto result = invoiceService.getInvoiceById(1L);
 
         assertEquals(1L, result.getId());
         assertEquals("INV-001", result.getInvoiceNumber());
         assertEquals("Test Customer 1", result.getCustomerName());
         verify(invoiceRepository, times(1)).findById(1L);
+        verify(invoiceMapper, times(1)).toDto(testInvoice1);
     }
 
     @Test
@@ -98,12 +137,13 @@ public class InvoiceServiceTest {
     void getInvoiceByInvoiceNumber_WhenInvoiceExists_ShouldReturnInvoice() {
         when(invoiceRepository.findByInvoiceNumber("INV-001")).thenReturn(Optional.of(testInvoice1));
 
-        Invoice result = invoiceService.getInvoiceByInvoiceNumber("INV-001");
+        InvoiceResponseDto result = invoiceService.getInvoiceByInvoiceNumber("INV-001");
 
         assertEquals(1L, result.getId());
         assertEquals("INV-001", result.getInvoiceNumber());
         assertEquals("Test Customer 1", result.getCustomerName());
         verify(invoiceRepository, times(1)).findByInvoiceNumber("INV-001");
+        verify(invoiceMapper, times(1)).toDto(testInvoice1);
     }
 
     @Test
@@ -120,6 +160,15 @@ public class InvoiceServiceTest {
 
     @Test
     void createInvoice_WhenInvoiceNumberDoesNotExist_ShouldCreateInvoice() {
+        InvoiceRequestDto newInvoiceRequestDto = new InvoiceRequestDto();
+        newInvoiceRequestDto.setInvoiceNumber("INV-003");
+        newInvoiceRequestDto.setCustomerName("New Customer");
+        newInvoiceRequestDto.setInvoiceDate(LocalDate.of(2023, 3, 1));
+        newInvoiceRequestDto.setDueDate(LocalDate.of(2023, 3, 31));
+        newInvoiceRequestDto.setAmount(new BigDecimal("3000.00"));
+        newInvoiceRequestDto.setDescription("New Invoice");
+        newInvoiceRequestDto.setStatus(Invoice.InvoiceStatus.PENDING);
+
         Invoice newInvoice = new Invoice();
         newInvoice.setInvoiceNumber("INV-003");
         newInvoice.setCustomerName("New Customer");
@@ -139,33 +188,47 @@ public class InvoiceServiceTest {
         savedInvoice.setDescription("New Invoice");
         savedInvoice.setStatus(Invoice.InvoiceStatus.PENDING);
 
-        when(invoiceRepository.existsByInvoiceNumber("INV-003")).thenReturn(false);
-        when(invoiceRepository.save(any(Invoice.class))).thenReturn(savedInvoice);
+        InvoiceResponseDto savedInvoiceResponseDto = new InvoiceResponseDto();
+        savedInvoiceResponseDto.setId(3L);
+        savedInvoiceResponseDto.setInvoiceNumber("INV-003");
+        savedInvoiceResponseDto.setCustomerName("New Customer");
+        savedInvoiceResponseDto.setInvoiceDate(LocalDate.of(2023, 3, 1));
+        savedInvoiceResponseDto.setDueDate(LocalDate.of(2023, 3, 31));
+        savedInvoiceResponseDto.setAmount(new BigDecimal("3000.00"));
+        savedInvoiceResponseDto.setDescription("New Invoice");
+        savedInvoiceResponseDto.setStatus(Invoice.InvoiceStatus.PENDING);
 
-        Invoice result = invoiceService.createInvoice(newInvoice);
+        when(invoiceRepository.existsByInvoiceNumber("INV-003")).thenReturn(false);
+        when(invoiceMapper.toEntity(newInvoiceRequestDto)).thenReturn(newInvoice);
+        when(invoiceRepository.save(any(Invoice.class))).thenReturn(savedInvoice);
+        when(invoiceMapper.toDto(savedInvoice)).thenReturn(savedInvoiceResponseDto);
+
+        InvoiceResponseDto result = invoiceService.createInvoice(newInvoiceRequestDto);
 
         assertEquals(3L, result.getId());
         assertEquals("INV-003", result.getInvoiceNumber());
         assertEquals("New Customer", result.getCustomerName());
         verify(invoiceRepository, times(1)).existsByInvoiceNumber("INV-003");
+        verify(invoiceMapper, times(1)).toEntity(newInvoiceRequestDto);
         verify(invoiceRepository, times(1)).save(any(Invoice.class));
+        verify(invoiceMapper, times(1)).toDto(savedInvoice);
     }
 
     @Test
     void createInvoice_WhenInvoiceNumberExists_ShouldThrowException() {
-        Invoice newInvoice = new Invoice();
-        newInvoice.setInvoiceNumber("INV-001");
-        newInvoice.setCustomerName("New Customer");
-        newInvoice.setInvoiceDate(LocalDate.of(2023, 3, 1));
-        newInvoice.setDueDate(LocalDate.of(2023, 3, 31));
-        newInvoice.setAmount(new BigDecimal("3000.00"));
-        newInvoice.setDescription("New Invoice");
-        newInvoice.setStatus(Invoice.InvoiceStatus.PENDING);
+        InvoiceRequestDto newInvoiceRequestDto = new InvoiceRequestDto();
+        newInvoiceRequestDto.setInvoiceNumber("INV-001");
+        newInvoiceRequestDto.setCustomerName("New Customer");
+        newInvoiceRequestDto.setInvoiceDate(LocalDate.of(2023, 3, 1));
+        newInvoiceRequestDto.setDueDate(LocalDate.of(2023, 3, 31));
+        newInvoiceRequestDto.setAmount(new BigDecimal("3000.00"));
+        newInvoiceRequestDto.setDescription("New Invoice");
+        newInvoiceRequestDto.setStatus(Invoice.InvoiceStatus.PENDING);
 
         when(invoiceRepository.existsByInvoiceNumber("INV-001")).thenReturn(true);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            invoiceService.createInvoice(newInvoice);
+            invoiceService.createInvoice(newInvoiceRequestDto);
         });
 
         assertEquals("Invoice with number INV-001 already exists", exception.getMessage());
@@ -175,7 +238,17 @@ public class InvoiceServiceTest {
 
     @Test
     void updateInvoice_WhenInvoiceExistsAndInvoiceNumberNotChanged_ShouldUpdateInvoice() {
+        InvoiceRequestDto updatedInvoiceRequestDto = new InvoiceRequestDto();
+        updatedInvoiceRequestDto.setInvoiceNumber("INV-001");
+        updatedInvoiceRequestDto.setCustomerName("Updated Customer");
+        updatedInvoiceRequestDto.setInvoiceDate(LocalDate.of(2023, 1, 1));
+        updatedInvoiceRequestDto.setDueDate(LocalDate.of(2023, 1, 31));
+        updatedInvoiceRequestDto.setAmount(new BigDecimal("1500.00"));
+        updatedInvoiceRequestDto.setDescription("Updated Invoice");
+        updatedInvoiceRequestDto.setStatus(Invoice.InvoiceStatus.PAID);
+
         Invoice updatedInvoice = new Invoice();
+        updatedInvoice.setId(1L);
         updatedInvoice.setInvoiceNumber("INV-001");
         updatedInvoice.setCustomerName("Updated Customer");
         updatedInvoice.setInvoiceDate(LocalDate.of(2023, 1, 1));
@@ -184,10 +257,21 @@ public class InvoiceServiceTest {
         updatedInvoice.setDescription("Updated Invoice");
         updatedInvoice.setStatus(Invoice.InvoiceStatus.PAID);
 
+        InvoiceResponseDto updatedInvoiceResponseDto = new InvoiceResponseDto();
+        updatedInvoiceResponseDto.setId(1L);
+        updatedInvoiceResponseDto.setInvoiceNumber("INV-001");
+        updatedInvoiceResponseDto.setCustomerName("Updated Customer");
+        updatedInvoiceResponseDto.setInvoiceDate(LocalDate.of(2023, 1, 1));
+        updatedInvoiceResponseDto.setDueDate(LocalDate.of(2023, 1, 31));
+        updatedInvoiceResponseDto.setAmount(new BigDecimal("1500.00"));
+        updatedInvoiceResponseDto.setDescription("Updated Invoice");
+        updatedInvoiceResponseDto.setStatus(Invoice.InvoiceStatus.PAID);
+
         when(invoiceRepository.findById(1L)).thenReturn(Optional.of(testInvoice1));
         when(invoiceRepository.save(any(Invoice.class))).thenReturn(updatedInvoice);
+        when(invoiceMapper.toDto(updatedInvoice)).thenReturn(updatedInvoiceResponseDto);
 
-        Invoice result = invoiceService.updateInvoice(1L, updatedInvoice);
+        InvoiceResponseDto result = invoiceService.updateInvoice(1L, updatedInvoiceRequestDto);
 
         assertEquals("INV-001", result.getInvoiceNumber());
         assertEquals("Updated Customer", result.getCustomerName());
@@ -195,11 +279,22 @@ public class InvoiceServiceTest {
         assertEquals(Invoice.InvoiceStatus.PAID, result.getStatus());
         verify(invoiceRepository, times(1)).findById(1L);
         verify(invoiceRepository, times(1)).save(any(Invoice.class));
+        verify(invoiceMapper, times(1)).toDto(updatedInvoice);
     }
 
     @Test
     void updateInvoice_WhenInvoiceExistsAndInvoiceNumberChangedToNonExisting_ShouldUpdateInvoice() {
+        InvoiceRequestDto updatedInvoiceRequestDto = new InvoiceRequestDto();
+        updatedInvoiceRequestDto.setInvoiceNumber("INV-003");
+        updatedInvoiceRequestDto.setCustomerName("Updated Customer");
+        updatedInvoiceRequestDto.setInvoiceDate(LocalDate.of(2023, 1, 1));
+        updatedInvoiceRequestDto.setDueDate(LocalDate.of(2023, 1, 31));
+        updatedInvoiceRequestDto.setAmount(new BigDecimal("1500.00"));
+        updatedInvoiceRequestDto.setDescription("Updated Invoice");
+        updatedInvoiceRequestDto.setStatus(Invoice.InvoiceStatus.PAID);
+
         Invoice updatedInvoice = new Invoice();
+        updatedInvoice.setId(1L);
         updatedInvoice.setInvoiceNumber("INV-003");
         updatedInvoice.setCustomerName("Updated Customer");
         updatedInvoice.setInvoiceDate(LocalDate.of(2023, 1, 1));
@@ -208,35 +303,47 @@ public class InvoiceServiceTest {
         updatedInvoice.setDescription("Updated Invoice");
         updatedInvoice.setStatus(Invoice.InvoiceStatus.PAID);
 
+        InvoiceResponseDto updatedInvoiceResponseDto = new InvoiceResponseDto();
+        updatedInvoiceResponseDto.setId(1L);
+        updatedInvoiceResponseDto.setInvoiceNumber("INV-003");
+        updatedInvoiceResponseDto.setCustomerName("Updated Customer");
+        updatedInvoiceResponseDto.setInvoiceDate(LocalDate.of(2023, 1, 1));
+        updatedInvoiceResponseDto.setDueDate(LocalDate.of(2023, 1, 31));
+        updatedInvoiceResponseDto.setAmount(new BigDecimal("1500.00"));
+        updatedInvoiceResponseDto.setDescription("Updated Invoice");
+        updatedInvoiceResponseDto.setStatus(Invoice.InvoiceStatus.PAID);
+
         when(invoiceRepository.findById(1L)).thenReturn(Optional.of(testInvoice1));
         when(invoiceRepository.existsByInvoiceNumber("INV-003")).thenReturn(false);
         when(invoiceRepository.save(any(Invoice.class))).thenReturn(updatedInvoice);
+        when(invoiceMapper.toDto(updatedInvoice)).thenReturn(updatedInvoiceResponseDto);
 
-        Invoice result = invoiceService.updateInvoice(1L, updatedInvoice);
+        InvoiceResponseDto result = invoiceService.updateInvoice(1L, updatedInvoiceRequestDto);
 
         assertEquals("INV-003", result.getInvoiceNumber());
         assertEquals("Updated Customer", result.getCustomerName());
         verify(invoiceRepository, times(1)).findById(1L);
         verify(invoiceRepository, times(1)).existsByInvoiceNumber("INV-003");
         verify(invoiceRepository, times(1)).save(any(Invoice.class));
+        verify(invoiceMapper, times(1)).toDto(updatedInvoice);
     }
 
     @Test
     void updateInvoice_WhenInvoiceExistsAndInvoiceNumberChangedToExisting_ShouldThrowException() {
-        Invoice updatedInvoice = new Invoice();
-        updatedInvoice.setInvoiceNumber("INV-002");
-        updatedInvoice.setCustomerName("Updated Customer");
-        updatedInvoice.setInvoiceDate(LocalDate.of(2023, 1, 1));
-        updatedInvoice.setDueDate(LocalDate.of(2023, 1, 31));
-        updatedInvoice.setAmount(new BigDecimal("1500.00"));
-        updatedInvoice.setDescription("Updated Invoice");
-        updatedInvoice.setStatus(Invoice.InvoiceStatus.PAID);
+        InvoiceRequestDto updatedInvoiceRequestDto = new InvoiceRequestDto();
+        updatedInvoiceRequestDto.setInvoiceNumber("INV-002");
+        updatedInvoiceRequestDto.setCustomerName("Updated Customer");
+        updatedInvoiceRequestDto.setInvoiceDate(LocalDate.of(2023, 1, 1));
+        updatedInvoiceRequestDto.setDueDate(LocalDate.of(2023, 1, 31));
+        updatedInvoiceRequestDto.setAmount(new BigDecimal("1500.00"));
+        updatedInvoiceRequestDto.setDescription("Updated Invoice");
+        updatedInvoiceRequestDto.setStatus(Invoice.InvoiceStatus.PAID);
 
         when(invoiceRepository.findById(1L)).thenReturn(Optional.of(testInvoice1));
         when(invoiceRepository.existsByInvoiceNumber("INV-002")).thenReturn(true);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            invoiceService.updateInvoice(1L, updatedInvoice);
+            invoiceService.updateInvoice(1L, updatedInvoiceRequestDto);
         });
 
         assertEquals("Invoice with number INV-002 already exists", exception.getMessage());

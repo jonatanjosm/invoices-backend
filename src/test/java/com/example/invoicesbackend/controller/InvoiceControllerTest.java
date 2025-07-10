@@ -1,5 +1,7 @@
 package com.example.invoicesbackend.controller;
 
+import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
+import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
 import com.example.invoicesbackend.model.Invoice;
 import com.example.invoicesbackend.service.InvoiceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,13 +37,13 @@ public class InvoiceControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Invoice testInvoice1;
-    private Invoice testInvoice2;
-    private List<Invoice> allInvoices;
+    private InvoiceResponseDto testInvoice1;
+    private InvoiceResponseDto testInvoice2;
+    private List<InvoiceResponseDto> allInvoices;
 
     @BeforeEach
     void setUp() {
-        testInvoice1 = new Invoice();
+        testInvoice1 = new InvoiceResponseDto();
         testInvoice1.setId(1L);
         testInvoice1.setInvoiceNumber("INV-001");
         testInvoice1.setCustomerName("Test Customer 1");
@@ -51,7 +53,7 @@ public class InvoiceControllerTest {
         testInvoice1.setDescription("Test Invoice 1");
         testInvoice1.setStatus(Invoice.InvoiceStatus.PENDING);
 
-        testInvoice2 = new Invoice();
+        testInvoice2 = new InvoiceResponseDto();
         testInvoice2.setId(2L);
         testInvoice2.setInvoiceNumber("INV-002");
         testInvoice2.setCustomerName("Test Customer 2");
@@ -104,7 +106,7 @@ public class InvoiceControllerTest {
 
     @Test
     void createInvoice_ShouldCreateAndReturnInvoice() throws Exception {
-        Invoice newInvoice = new Invoice();
+        InvoiceRequestDto newInvoice = new InvoiceRequestDto();
         newInvoice.setInvoiceNumber("INV-003");
         newInvoice.setCustomerName("New Customer");
         newInvoice.setInvoiceDate(LocalDate.of(2023, 3, 1));
@@ -113,7 +115,7 @@ public class InvoiceControllerTest {
         newInvoice.setDescription("New Invoice");
         newInvoice.setStatus(Invoice.InvoiceStatus.PENDING);
 
-        Invoice savedInvoice = new Invoice();
+        InvoiceResponseDto savedInvoice = new InvoiceResponseDto();
         savedInvoice.setId(3L);
         savedInvoice.setInvoiceNumber("INV-003");
         savedInvoice.setCustomerName("New Customer");
@@ -123,7 +125,7 @@ public class InvoiceControllerTest {
         savedInvoice.setDescription("New Invoice");
         savedInvoice.setStatus(Invoice.InvoiceStatus.PENDING);
 
-        when(invoiceService.createInvoice(any(Invoice.class))).thenReturn(savedInvoice);
+        when(invoiceService.createInvoice(any(InvoiceRequestDto.class))).thenReturn(savedInvoice);
 
         mockMvc.perform(post("/api/invoices")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +139,7 @@ public class InvoiceControllerTest {
 
     @Test
     void updateInvoice_ShouldUpdateAndReturnInvoice() throws Exception {
-        Invoice updatedInvoice = new Invoice();
+        InvoiceRequestDto updatedInvoice = new InvoiceRequestDto();
         updatedInvoice.setInvoiceNumber("INV-001");
         updatedInvoice.setCustomerName("Updated Customer");
         updatedInvoice.setInvoiceDate(LocalDate.of(2023, 1, 1));
@@ -146,7 +148,7 @@ public class InvoiceControllerTest {
         updatedInvoice.setDescription("Updated Invoice");
         updatedInvoice.setStatus(Invoice.InvoiceStatus.PAID);
 
-        Invoice savedInvoice = new Invoice();
+        InvoiceResponseDto savedInvoice = new InvoiceResponseDto();
         savedInvoice.setId(1L);
         savedInvoice.setInvoiceNumber("INV-001");
         savedInvoice.setCustomerName("Updated Customer");
@@ -156,7 +158,7 @@ public class InvoiceControllerTest {
         savedInvoice.setDescription("Updated Invoice");
         savedInvoice.setStatus(Invoice.InvoiceStatus.PAID);
 
-        when(invoiceService.updateInvoice(eq(1L), any(Invoice.class))).thenReturn(savedInvoice);
+        when(invoiceService.updateInvoice(eq(1L), any(InvoiceRequestDto.class))).thenReturn(savedInvoice);
 
         mockMvc.perform(put("/api/invoices/1")
                 .contentType(MediaType.APPLICATION_JSON)

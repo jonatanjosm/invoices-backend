@@ -1,6 +1,9 @@
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/mapper/InvoiceMapper.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/controller/InvoiceController.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/model/Invoice.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/InvoicesBackendApplication.java
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/response/InvoiceResponseDto.java
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/request/InvoiceRequestDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/service/InvoiceService.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/config/DataLoader.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/exception/GlobalExceptionHandler.java
