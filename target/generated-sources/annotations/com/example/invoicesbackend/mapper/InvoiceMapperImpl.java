@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-10T08:31:59-0500",
-    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 19.0.2 (Homebrew)"
+    date = "2025-07-10T08:52:21-0500",
+    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.10 (Amazon.com Inc.)"
 )
 @Component
 public class InvoiceMapperImpl implements InvoiceMapper {
@@ -31,7 +31,6 @@ public class InvoiceMapperImpl implements InvoiceMapper {
         invoice.setInvoiceNumber( requestDto.getInvoiceNumber() );
         invoice.setCustomerName( requestDto.getCustomerName() );
         invoice.setInvoiceDate( requestDto.getInvoiceDate() );
-        invoice.setDueDate( requestDto.getDueDate() );
         invoice.setDescription( requestDto.getDescription() );
         invoice.setStatus( requestDto.getStatus() );
 
@@ -50,7 +49,6 @@ public class InvoiceMapperImpl implements InvoiceMapper {
         invoiceResponseDto.setInvoiceNumber( invoice.getInvoiceNumber() );
         invoiceResponseDto.setCustomerName( invoice.getCustomerName() );
         invoiceResponseDto.setInvoiceDate( invoice.getInvoiceDate() );
-        invoiceResponseDto.setDueDate( invoice.getDueDate() );
         invoiceResponseDto.setAmount( invoice.getAmount() );
         invoiceResponseDto.setDescription( invoice.getDescription() );
         invoiceResponseDto.setStatus( invoice.getStatus() );
@@ -87,9 +85,6 @@ public class InvoiceMapperImpl implements InvoiceMapper {
         }
         if ( requestDto.getInvoiceDate() != null ) {
             invoice.setInvoiceDate( requestDto.getInvoiceDate() );
-        }
-        if ( requestDto.getDueDate() != null ) {
-            invoice.setDueDate( requestDto.getDueDate() );
         }
         if ( requestDto.getDescription() != null ) {
             invoice.setDescription( requestDto.getDescription() );

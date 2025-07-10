@@ -81,7 +81,6 @@ Request Body:
   "invoiceNumber": "INV-004",
   "customerName": "Example Customer",
   "invoiceDate": "2023-01-01",
-  "dueDate": "2023-01-31",
   "amount": 1000.00,
   "description": "Example invoice",
   "status": "PENDING"
@@ -100,7 +99,6 @@ Request Body:
   "invoiceNumber": "INV-004",
   "customerName": "Updated Customer",
   "invoiceDate": "2023-01-01",
-  "dueDate": "2023-01-31",
   "amount": 1500.00,
   "description": "Updated invoice",
   "status": "PAID"
@@ -131,7 +129,7 @@ The application is pre-loaded with sample data for testing purposes:
 
 1. Invoice Number: INV-001, Customer: Acme Corporation, Status: PENDING
 2. Invoice Number: INV-002, Customer: Globex Inc., Status: PAID
-3. Invoice Number: INV-003, Customer: Wayne Enterprises, Status: OVERDUE
+3. Invoice Number: INV-003, Customer: Wayne Enterprises, Status: PENDING
 
 ## Error Handling
 

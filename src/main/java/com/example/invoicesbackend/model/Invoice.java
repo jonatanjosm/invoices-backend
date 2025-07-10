@@ -34,8 +34,6 @@ public class Invoice {
     @NotNull(message = "Invoice date is required")
     private LocalDate invoiceDate;
 
-    @NotNull(message = "Due date is required")
-    private LocalDate dueDate;
 
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
@@ -60,7 +58,7 @@ public class Invoice {
     }
 
     public enum InvoiceStatus {
-        PENDING, PAID, OVERDUE
+        PENDING, PAID
     }
 
     public void calculateAmount() {

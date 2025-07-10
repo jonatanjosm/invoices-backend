@@ -1,5 +1,14 @@
 package com.example.invoicesbackend.cqrs.command.invoice;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.example.invoicesbackend.cqrs.CommandHandler;
 import com.example.invoicesbackend.dto.request.LineItemRequestDto;
 import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
@@ -9,13 +18,6 @@ import com.example.invoicesbackend.model.Invoice;
 import com.example.invoicesbackend.model.LineItem;
 import com.example.invoicesbackend.repository.InvoiceRepository;
 import com.example.invoicesbackend.repository.LineItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Handler for the UpdateInvoiceCommand.
@@ -24,7 +26,9 @@ import java.util.stream.Collectors;
 public class UpdateInvoiceCommandHandler implements CommandHandler<UpdateInvoiceCommand, InvoiceResponseDto> {
 
     private final InvoiceRepository invoiceRepository;
+
     private final InvoiceMapper invoiceMapper;
+
     private final LineItemRepository lineItemRepository;
 
     @Autowired
@@ -37,13 +41,19 @@ public class UpdateInvoiceCommandHandler implements CommandHandler<UpdateInvoice
     @Override
     public InvoiceResponseDto handle(UpdateInvoiceCommand command) {
         Invoice invoice = invoiceRepository
-                .findByInvoiceNumber(command.getUpdateInvoiceRequestDto().getInvoiceNumber())
-                .orElseThrow(() -> new EntityNotFoundException("Invoice not found with number: " + command.getUpdateInvoiceRequestDto().getInvoiceNumber()));
+              .findByInvoiceNumber(command.getUpdateInvoiceRequestDto().getInvoiceNumber())
+              .orElseThrow(
+                    () -> new EntityNotFoundException("Invoice not found with number: " + command.getUpdateInvoiceRequestDto().getInvoiceNumber()));
 
         // Only update if the invoice number is not changed or the new invoice number doesn't exist
         if (!invoice.getInvoiceNumber().equals(command.getUpdateInvoiceRequestDto().getInvoiceNumber()) && invoiceRepository.existsByInvoiceNumber(
-                command.getUpdateInvoiceRequestDto().getInvoiceNumber())) {
+              command.getUpdateInvoiceRequestDto().getInvoiceNumber())) {
             throw new IllegalArgumentException("Invoice with number " + command.getUpdateInvoiceRequestDto().getInvoiceNumber() + " already exists");
+        }
+
+        if (Invoice.InvoiceStatus.PAID.equals(invoice.getStatus())) {
+            throw new IllegalArgumentException(
+                  "Invoice with number " + command.getUpdateInvoiceRequestDto().getInvoiceNumber() + " has been already paid");
         }
 
         List<LineItem> items = invoice.getLineItems();

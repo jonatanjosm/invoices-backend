@@ -28,8 +28,6 @@ public class InvoiceRequestDto {
     @NotNull(message = "Invoice date is required")
     private LocalDate invoiceDate;
 
-    @NotNull(message = "Due date is required")
-    private LocalDate dueDate;
 
     private String description;
 

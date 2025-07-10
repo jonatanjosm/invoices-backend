@@ -19,7 +19,6 @@ public class InvoiceResponseDto {
     private String invoiceNumber;
     private String customerName;
     private LocalDate invoiceDate;
-    private LocalDate dueDate;
     private BigDecimal amount;
     private String description;
     private Invoice.InvoiceStatus status;
