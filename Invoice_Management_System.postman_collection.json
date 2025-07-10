@@ -78,7 +78,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"invoiceNumber\": \"INV-004\",\n  \"customerName\": \"Example Customer\",\n  \"invoiceDate\": \"2023-01-01\",\n  \"dueDate\": \"2023-01-31\",\n  \"amount\": 1000.00,\n  \"description\": \"Example invoice\",\n  \"status\": \"PENDING\",\n  \"lineItems\": [\n    {\n      \"description\": \"Item 1\",\n      \"price\": 500.00,\n      \"quantity\": 1\n    },\n    {\n      \"description\": \"Item 2\",\n      \"price\": 250.00,\n      \"quantity\": 2\n    }\n  ]\n}"
+          "raw": "{\n  \"invoiceNumber\": \"INV-004\",\n  \"customerName\": \"Example Customer\",\n  \"invoiceDate\": \"2023-01-01\",\n  \"dueDate\": \"2023-01-31\",\n  \"description\": \"Example invoice\",\n  \"status\": \"PENDING\",\n  \"lineItems\": [\n    {\n      \"description\": \"Item 1\",\n      \"price\": 500.00,\n      \"quantity\": 1\n    },\n    {\n      \"description\": \"Item 2\",\n      \"price\": 250.00,\n      \"quantity\": 2\n    }\n  ]\n}"
         },
         "url": {
           "raw": "{{base_url}}/api/invoices",
@@ -90,7 +90,7 @@
             "invoices"
           ]
         },
-        "description": "Creates a new invoice in the system"
+        "description": "Creates a new invoice in the system. The total amount will be calculated based on the line items."
       },
       "response": []
     },
@@ -106,7 +106,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"invoiceNumber\": \"INV-004\",\n  \"customerName\": \"Updated Customer\",\n  \"invoiceDate\": \"2023-01-01\",\n  \"dueDate\": \"2023-01-31\",\n  \"amount\": 1500.00,\n  \"description\": \"Updated invoice\",\n  \"status\": \"PAID\",\n  \"lineItems\": [\n    {\n      \"description\": \"Updated Item 1\",\n      \"price\": 750.00,\n      \"quantity\": 1\n    },\n    {\n      \"description\": \"Updated Item 2\",\n      \"price\": 375.00,\n      \"quantity\": 2\n    }\n  ]\n}"
+          "raw": "{\n  \"invoiceNumber\": \"INV-004\",\n  \"customerName\": \"Updated Customer\",\n  \"invoiceDate\": \"2023-01-01\",\n  \"dueDate\": \"2023-01-31\",\n  \"description\": \"Updated invoice\",\n  \"status\": \"PAID\",\n  \"lineItems\": [\n    {\n      \"description\": \"New Item 1\",\n      \"price\": 750.00,\n      \"quantity\": 1\n    },\n    {\n      \"description\": \"New Item 2\",\n      \"price\": 375.00,\n      \"quantity\": 2\n    }\n  ]\n}"
         },
         "url": {
           "raw": "{{base_url}}/api/invoices/1",
@@ -119,7 +119,7 @@
             "1"
           ]
         },
-        "description": "Updates an existing invoice in the system"
+        "description": "Updates an existing invoice in the system. The line items in the request will be added to the existing ones, and the total amount will be recalculated."
       },
       "response": []
     }

@@ -62,4 +62,14 @@ public class Invoice {
     public enum InvoiceStatus {
         PENDING, PAID, OVERDUE
     }
+
+    public void calculateAmount() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (LineItem lineItem : lineItems) {
+            if (lineItem.getTotalAmount() != null) {
+                total = total.add(lineItem.getTotalAmount());
+            }
+        }
+        this.amount = total;
+    }
 }

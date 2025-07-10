@@ -1,6 +1,7 @@
 package com.example.invoicesbackend.controller;
 
 import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
+import com.example.invoicesbackend.dto.request.UpdateInvoiceRequestDto;
 import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
 import com.example.invoicesbackend.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +48,9 @@ public class InvoiceController {
         return new ResponseEntity<>(newInvoice, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<InvoiceResponseDto> updateInvoice(@PathVariable Long id, @Valid @RequestBody InvoiceRequestDto invoiceRequestDto) {
-        InvoiceResponseDto updatedInvoice = invoiceService.updateInvoice(id, invoiceRequestDto);
+    @PutMapping
+    public ResponseEntity<InvoiceResponseDto> updateInvoice( @Valid @RequestBody UpdateInvoiceRequestDto invoiceRequestDto) {
+        InvoiceResponseDto updatedInvoice = invoiceService.updateInvoice(invoiceRequestDto);
         return new ResponseEntity<>(updatedInvoice, HttpStatus.OK);
     }
 }

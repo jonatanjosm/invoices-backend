@@ -31,10 +31,6 @@ public class InvoiceRequestDto {
     @NotNull(message = "Due date is required")
     private LocalDate dueDate;
 
-    @NotNull(message = "Amount is required")
-    @Positive(message = "Amount must be positive")
-    private BigDecimal amount;
-
     private String description;
 
     private Invoice.InvoiceStatus status = Invoice.InvoiceStatus.PENDING;
