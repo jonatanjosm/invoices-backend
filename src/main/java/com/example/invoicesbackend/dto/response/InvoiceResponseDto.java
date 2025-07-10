@@ -23,4 +23,5 @@ public class InvoiceResponseDto {
     private String description;
     private Invoice.InvoiceStatus status;
     private List<LineItemResponseDto> lineItems = new ArrayList<>();
+    private PaymentInfoDto paymentInfo;
 }

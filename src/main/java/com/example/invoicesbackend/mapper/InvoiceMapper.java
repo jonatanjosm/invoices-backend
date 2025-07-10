@@ -2,7 +2,9 @@ package com.example.invoicesbackend.mapper;
 
 import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
 import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
+import com.example.invoicesbackend.dto.response.PaymentInfoDto;
 import com.example.invoicesbackend.model.Invoice;
+import com.example.invoicesbackend.model.Payment;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -15,6 +17,7 @@ public interface InvoiceMapper {
     @Mapping(target = "amount", ignore = true)
     Invoice toEntity(InvoiceRequestDto requestDto);
 
+    @Mapping(target = "paymentInfo", expression = "java(mapPaymentInfo(invoice))")
     InvoiceResponseDto toDto(Invoice invoice);
 
     List<InvoiceResponseDto> toDtoList(List<Invoice> invoices);
@@ -38,5 +41,19 @@ public interface InvoiceMapper {
             // Recalculate the invoice amount
             invoice.calculateAmount();
         }
+    }
+
+    default PaymentInfoDto mapPaymentInfo(Invoice invoice) {
+        // Only include payment info if the invoice has been paid
+        if (invoice != null && Invoice.InvoiceStatus.PAID.equals(invoice.getStatus()) && invoice.getPayment() != null) {
+            Payment payment = invoice.getPayment();
+            PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
+            paymentInfoDto.setId(payment.getId());
+            paymentInfoDto.setPaymentDate(payment.getPaymentDate());
+            paymentInfoDto.setAmount(payment.getAmount());
+            paymentInfoDto.setPaymentMethod(payment.getPaymentMethod());
+            return paymentInfoDto;
+        }
+        return null;
     }
 }
