@@ -10,6 +10,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "invoices")
@@ -43,6 +45,19 @@ public class Invoice {
 
     @Enumerated(EnumType.STRING)
     private InvoiceStatus status = InvoiceStatus.PENDING;
+
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LineItem> lineItems = new ArrayList<>();
+
+    public void addLineItem(LineItem lineItem) {
+        lineItems.add(lineItem);
+        lineItem.setInvoice(this);
+    }
+
+    public void removeLineItem(LineItem lineItem) {
+        lineItems.remove(lineItem);
+        lineItem.setInvoice(null);
+    }
 
     public enum InvoiceStatus {
         PENDING, PAID, OVERDUE

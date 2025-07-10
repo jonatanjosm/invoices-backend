@@ -5,11 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -35,4 +38,7 @@ public class InvoiceRequestDto {
     private String description;
 
     private Invoice.InvoiceStatus status = Invoice.InvoiceStatus.PENDING;
+
+    @Valid
+    private List<LineItemRequestDto> lineItems = new ArrayList<>();
 }
