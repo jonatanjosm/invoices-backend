@@ -1,0 +1,9 @@
+com/example/invoicesbackend/repository/InvoiceRepository.class
+com/example/invoicesbackend/service/InvoiceService.class
+com/example/invoicesbackend/model/Invoice$InvoiceStatus.class
+com/example/invoicesbackend/InvoicesBackendApplication.class
+com/example/invoicesbackend/exception/GlobalExceptionHandler.class
+com/example/invoicesbackend/config/DataLoader.class
+com/example/invoicesbackend/model/Invoice.class
+com/example/invoicesbackend/controller/InvoiceController.class
+com/example/invoicesbackend/exception/GlobalExceptionHandler$ErrorResponse.class

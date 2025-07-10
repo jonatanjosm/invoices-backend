@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="invoices-backend" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="euler-academic-api" target="17" />
+      <module name="euler-academic-business" target="17" />
+      <module name="euler-academic-dto" target="17" />
+      <module name="euler-academic-model" target="17" />
+      <module name="euler-academic-util" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="euler-academic-api" options="-parameters" />
+      <module name="euler-academic-business" options="-parameters" />
+      <module name="euler-academic-dto" options="-parameters" />
+      <module name="euler-academic-model" options="-parameters" />
+      <module name="euler-academic-util" options="-parameters" />
+      <module name="invoices-backend" options="-parameters" />
+    </option>
+  </component>
+</project>
