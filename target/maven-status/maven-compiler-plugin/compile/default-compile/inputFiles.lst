@@ -1,8 +1,10 @@
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/command/invoice/PayInvoiceCommand.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/InvoicesBackendApplication.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/command/invoice/UpdateInvoiceCommand.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/QueryHandler.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/exception/GlobalExceptionHandler.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/repository/InvoiceRepository.java
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/command/invoice/PayInvoiceCommandHandler.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/command/invoice/UpdateInvoiceCommandHandler.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByIdQueryHandler.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByIdQuery.java
@@ -16,6 +18,7 @@
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/request/LineItemRequestDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/response/InvoiceResponseDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/Command.java
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/model/Payment.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/service/InvoiceService.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByInvoiceNumberQuery.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/query/invoice/GetAllInvoicesQueryHandler.java
@@ -24,7 +27,9 @@
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/controller/InvoiceController.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/cqrs/CommandHandler.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/request/InvoiceRequestDto.java
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/repository/PaymentRepository.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/model/LineItem.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/config/DataLoader.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/response/LineItemResponseDto.java
+/Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/dto/request/PaymentRequestDto.java
 /Users/jonatanmurcia/Documents/development/invoices-backend/src/main/java/com/example/invoicesbackend/repository/LineItemRepository.java

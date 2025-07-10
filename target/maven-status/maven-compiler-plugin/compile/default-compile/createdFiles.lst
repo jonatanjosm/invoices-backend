@@ -2,6 +2,7 @@ com/example/invoicesbackend/dto/request/UpdateInvoiceRequestDto.class
 com/example/invoicesbackend/repository/InvoiceRepository.class
 com/example/invoicesbackend/dto/response/InvoiceResponseDto.class
 com/example/invoicesbackend/cqrs/QueryHandler.class
+com/example/invoicesbackend/dto/request/PaymentRequestDto.class
 com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByIdQuery.class
 com/example/invoicesbackend/service/InvoiceService.class
 com/example/invoicesbackend/dto/response/LineItemResponseDto.class
@@ -10,11 +11,14 @@ com/example/invoicesbackend/cqrs/CommandHandler.class
 com/example/invoicesbackend/cqrs/command/invoice/UpdateInvoiceCommandHandler.class
 com/example/invoicesbackend/model/Invoice.class
 com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByInvoiceNumberQueryHandler.class
+com/example/invoicesbackend/repository/PaymentRepository.class
 com/example/invoicesbackend/cqrs/Command.class
+com/example/invoicesbackend/cqrs/command/invoice/PayInvoiceCommand.class
 com/example/invoicesbackend/mapper/LineItemMapperImpl.class
 com/example/invoicesbackend/cqrs/query/invoice/GetAllInvoicesQuery.class
 com/example/invoicesbackend/cqrs/query/invoice/GetInvoiceByInvoiceNumberQuery.class
 com/example/invoicesbackend/cqrs/query/invoice/GetAllInvoicesQueryHandler.class
+com/example/invoicesbackend/model/Payment.class
 com/example/invoicesbackend/dto/request/LineItemRequestDto.class
 com/example/invoicesbackend/model/Invoice$InvoiceStatus.class
 com/example/invoicesbackend/cqrs/command/invoice/CreateInvoiceCommand.class
@@ -25,6 +29,7 @@ com/example/invoicesbackend/controller/InvoiceController.class
 com/example/invoicesbackend/model/LineItem.class
 com/example/invoicesbackend/exception/GlobalExceptionHandler$ErrorResponse.class
 com/example/invoicesbackend/mapper/LineItemMapper.class
+com/example/invoicesbackend/cqrs/command/invoice/PayInvoiceCommandHandler.class
 com/example/invoicesbackend/repository/LineItemRepository.class
 com/example/invoicesbackend/cqrs/command/invoice/UpdateInvoiceCommand.class
 com/example/invoicesbackend/InvoicesBackendApplication.class

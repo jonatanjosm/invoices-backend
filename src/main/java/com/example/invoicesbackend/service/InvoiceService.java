@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.invoicesbackend.cqrs.command.invoice.CreateInvoiceCommand;
 import com.example.invoicesbackend.cqrs.command.invoice.CreateInvoiceCommandHandler;
+import com.example.invoicesbackend.cqrs.command.invoice.PayInvoiceCommand;
+import com.example.invoicesbackend.cqrs.command.invoice.PayInvoiceCommandHandler;
 import com.example.invoicesbackend.cqrs.command.invoice.UpdateInvoiceCommand;
 import com.example.invoicesbackend.cqrs.command.invoice.UpdateInvoiceCommandHandler;
 import com.example.invoicesbackend.cqrs.query.invoice.GetAllInvoicesQuery;
@@ -16,6 +18,7 @@ import com.example.invoicesbackend.cqrs.query.invoice.GetInvoiceByIdQueryHandler
 import com.example.invoicesbackend.cqrs.query.invoice.GetInvoiceByInvoiceNumberQuery;
 import com.example.invoicesbackend.cqrs.query.invoice.GetInvoiceByInvoiceNumberQueryHandler;
 import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
+import com.example.invoicesbackend.dto.request.PaymentRequestDto;
 import com.example.invoicesbackend.dto.request.UpdateInvoiceRequestDto;
 import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
 
@@ -28,6 +31,7 @@ public class InvoiceService {
 
     private final CreateInvoiceCommandHandler createInvoiceCommandHandler;
     private final UpdateInvoiceCommandHandler updateInvoiceCommandHandler;
+    private final PayInvoiceCommandHandler payInvoiceCommandHandler;
     private final GetAllInvoicesQueryHandler getAllInvoicesQueryHandler;
     private final GetInvoiceByIdQueryHandler getInvoiceByIdQueryHandler;
     private final GetInvoiceByInvoiceNumberQueryHandler getInvoiceByInvoiceNumberQueryHandler;
@@ -36,11 +40,13 @@ public class InvoiceService {
     public InvoiceService(
             CreateInvoiceCommandHandler createInvoiceCommandHandler,
             UpdateInvoiceCommandHandler updateInvoiceCommandHandler,
+            PayInvoiceCommandHandler payInvoiceCommandHandler,
             GetAllInvoicesQueryHandler getAllInvoicesQueryHandler,
             GetInvoiceByIdQueryHandler getInvoiceByIdQueryHandler,
             GetInvoiceByInvoiceNumberQueryHandler getInvoiceByInvoiceNumberQueryHandler) {
         this.createInvoiceCommandHandler = createInvoiceCommandHandler;
         this.updateInvoiceCommandHandler = updateInvoiceCommandHandler;
+        this.payInvoiceCommandHandler = payInvoiceCommandHandler;
         this.getAllInvoicesQueryHandler = getAllInvoicesQueryHandler;
         this.getInvoiceByIdQueryHandler = getInvoiceByIdQueryHandler;
         this.getInvoiceByInvoiceNumberQueryHandler = getInvoiceByInvoiceNumberQueryHandler;
@@ -93,5 +99,15 @@ public class InvoiceService {
      */
     public InvoiceResponseDto updateInvoice(UpdateInvoiceRequestDto updateInvoiceRequestDto) {
         return updateInvoiceCommandHandler.handle(new UpdateInvoiceCommand(updateInvoiceRequestDto));
+    }
+
+    /**
+     * Pay an invoice.
+     * 
+     * @param paymentRequestDto The payment request DTO
+     * @return The updated invoice response DTO
+     */
+    public InvoiceResponseDto payInvoice(PaymentRequestDto paymentRequestDto) {
+        return payInvoiceCommandHandler.handle(new PayInvoiceCommand(paymentRequestDto));
     }
 }

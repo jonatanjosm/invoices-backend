@@ -1,6 +1,7 @@
 package com.example.invoicesbackend.controller;
 
 import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
+import com.example.invoicesbackend.dto.request.PaymentRequestDto;
 import com.example.invoicesbackend.dto.request.UpdateInvoiceRequestDto;
 import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
 import com.example.invoicesbackend.service.InvoiceService;
@@ -52,5 +53,17 @@ public class InvoiceController {
     public ResponseEntity<InvoiceResponseDto> updateInvoice( @Valid @RequestBody UpdateInvoiceRequestDto invoiceRequestDto) {
         InvoiceResponseDto updatedInvoice = invoiceService.updateInvoice(invoiceRequestDto);
         return new ResponseEntity<>(updatedInvoice, HttpStatus.OK);
+    }
+
+    /**
+     * Pay an invoice.
+     * 
+     * @param paymentRequestDto The payment request DTO
+     * @return The updated invoice response DTO
+     */
+    @PostMapping("/pay")
+    public ResponseEntity<InvoiceResponseDto> payInvoice(@Valid @RequestBody PaymentRequestDto paymentRequestDto) {
+        InvoiceResponseDto paidInvoice = invoiceService.payInvoice(paymentRequestDto);
+        return new ResponseEntity<>(paidInvoice, HttpStatus.OK);
     }
 }

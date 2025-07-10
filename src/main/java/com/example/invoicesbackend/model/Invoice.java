@@ -47,6 +47,9 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LineItem> lineItems = new ArrayList<>();
 
+    @OneToOne(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Payment payment;
+
     public void addLineItem(LineItem lineItem) {
         lineItems.add(lineItem);
         lineItem.setInvoice(this);
@@ -55,6 +58,19 @@ public class Invoice {
     public void removeLineItem(LineItem lineItem) {
         lineItems.remove(lineItem);
         lineItem.setInvoice(null);
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+        payment.setInvoice(this);
+    }
+
+    public void removePayment() {
+        if (payment != null) {
+            Payment paymentToRemove = this.payment;
+            this.payment = null;
+            paymentToRemove.setInvoice(null);
+        }
     }
 
     public enum InvoiceStatus {

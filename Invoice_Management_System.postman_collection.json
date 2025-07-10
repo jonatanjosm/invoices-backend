@@ -7,6 +7,35 @@
   },
   "item": [
     {
+      "name": "Pay Invoice",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"invoiceNumber\": \"INV-001\",\n  \"paymentDate\": \"2023-01-15\",\n  \"amount\": 1000.00,\n  \"paymentMethod\": \"Credit Card\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/invoices/pay",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "invoices",
+            "pay"
+          ]
+        },
+        "description": "Pays an invoice. The invoice must be in PENDING status, and the payment amount must match the invoice amount."
+      },
+      "response": []
+    },
+    {
       "name": "Get All Invoices",
       "request": {
         "method": "GET",
@@ -106,17 +135,16 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"invoiceNumber\": \"INV-004\",\n  \"customerName\": \"Updated Customer\",\n  \"invoiceDate\": \"2023-01-01\",\n  \"description\": \"Updated invoice\",\n  \"status\": \"PAID\",\n  \"lineItems\": [\n    {\n      \"description\": \"New Item 1\",\n      \"price\": 750.00,\n      \"quantity\": 1\n    },\n    {\n      \"description\": \"New Item 2\",\n      \"price\": 375.00,\n      \"quantity\": 2\n    }\n  ]\n}"
+          "raw": "{\n  \"invoiceNumber\": \"INV-004\",\n  \"lineItems\": [\n    {\n      \"description\": \"New Item 1\",\n      \"price\": 750.00,\n      \"quantity\": 1\n    },\n    {\n      \"description\": \"New Item 2\",\n      \"price\": 375.00,\n      \"quantity\": 2\n    }\n  ]\n}"
         },
         "url": {
-          "raw": "{{base_url}}/api/invoices/1",
+          "raw": "{{base_url}}/api/invoices",
           "host": [
             "{{base_url}}"
           ],
           "path": [
             "api",
-            "invoices",
-            "1"
+            "invoices"
           ]
         },
         "description": "Updates an existing invoice in the system. The line items in the request will be added to the existing ones, and the total amount will be recalculated."
