@@ -1,112 +1,97 @@
 package com.example.invoicesbackend.service;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.invoicesbackend.cqrs.command.invoice.CreateInvoiceCommand;
+import com.example.invoicesbackend.cqrs.command.invoice.CreateInvoiceCommandHandler;
+import com.example.invoicesbackend.cqrs.command.invoice.UpdateInvoiceCommand;
+import com.example.invoicesbackend.cqrs.command.invoice.UpdateInvoiceCommandHandler;
+import com.example.invoicesbackend.cqrs.query.invoice.GetAllInvoicesQuery;
+import com.example.invoicesbackend.cqrs.query.invoice.GetAllInvoicesQueryHandler;
+import com.example.invoicesbackend.cqrs.query.invoice.GetInvoiceByIdQuery;
+import com.example.invoicesbackend.cqrs.query.invoice.GetInvoiceByIdQueryHandler;
+import com.example.invoicesbackend.cqrs.query.invoice.GetInvoiceByInvoiceNumberQuery;
+import com.example.invoicesbackend.cqrs.query.invoice.GetInvoiceByInvoiceNumberQueryHandler;
 import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
-import com.example.invoicesbackend.dto.request.LineItemRequestDto;
 import com.example.invoicesbackend.dto.request.UpdateInvoiceRequestDto;
 import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
-import com.example.invoicesbackend.mapper.InvoiceMapper;
-import com.example.invoicesbackend.mapper.LineItemMapper;
-import com.example.invoicesbackend.model.Invoice;
-import com.example.invoicesbackend.model.LineItem;
-import com.example.invoicesbackend.repository.InvoiceRepository;
-import com.example.invoicesbackend.repository.LineItemRepository;
 
+/**
+ * Service for invoice operations using CQRS pattern.
+ * This service delegates to command and query handlers.
+ */
 @Service
 public class InvoiceService {
 
-    private final InvoiceRepository invoiceRepository;
-
-    private final InvoiceMapper invoiceMapper;
-
-    private final LineItemRepository lineItemRepository;
+    private final CreateInvoiceCommandHandler createInvoiceCommandHandler;
+    private final UpdateInvoiceCommandHandler updateInvoiceCommandHandler;
+    private final GetAllInvoicesQueryHandler getAllInvoicesQueryHandler;
+    private final GetInvoiceByIdQueryHandler getInvoiceByIdQueryHandler;
+    private final GetInvoiceByInvoiceNumberQueryHandler getInvoiceByInvoiceNumberQueryHandler;
 
     @Autowired
-    public InvoiceService(InvoiceRepository invoiceRepository, InvoiceMapper invoiceMapper, LineItemRepository lineItemRepository) {
-        this.invoiceRepository = invoiceRepository;
-        this.invoiceMapper = invoiceMapper;
-        this.lineItemRepository = lineItemRepository;
+    public InvoiceService(
+            CreateInvoiceCommandHandler createInvoiceCommandHandler,
+            UpdateInvoiceCommandHandler updateInvoiceCommandHandler,
+            GetAllInvoicesQueryHandler getAllInvoicesQueryHandler,
+            GetInvoiceByIdQueryHandler getInvoiceByIdQueryHandler,
+            GetInvoiceByInvoiceNumberQueryHandler getInvoiceByInvoiceNumberQueryHandler) {
+        this.createInvoiceCommandHandler = createInvoiceCommandHandler;
+        this.updateInvoiceCommandHandler = updateInvoiceCommandHandler;
+        this.getAllInvoicesQueryHandler = getAllInvoicesQueryHandler;
+        this.getInvoiceByIdQueryHandler = getInvoiceByIdQueryHandler;
+        this.getInvoiceByInvoiceNumberQueryHandler = getInvoiceByInvoiceNumberQueryHandler;
     }
 
+    /**
+     * Get all invoices.
+     * 
+     * @return List of invoice response DTOs
+     */
     public List<InvoiceResponseDto> getAllInvoices() {
-        List<Invoice> invoices = invoiceRepository.findAll();
-        return invoiceMapper.toDtoList(invoices);
+        return getAllInvoicesQueryHandler.handle(new GetAllInvoicesQuery());
     }
 
+    /**
+     * Get an invoice by its ID.
+     * 
+     * @param id The ID of the invoice to retrieve
+     * @return The invoice response DTO
+     */
     public InvoiceResponseDto getInvoiceById(Long id) {
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Invoice not found with id: " + id));
-        return invoiceMapper.toDto(invoice);
+        return getInvoiceByIdQueryHandler.handle(new GetInvoiceByIdQuery(id));
     }
 
+    /**
+     * Get an invoice by its invoice number.
+     * 
+     * @param invoiceNumber The invoice number of the invoice to retrieve
+     * @return The invoice response DTO
+     */
     public InvoiceResponseDto getInvoiceByInvoiceNumber(String invoiceNumber) {
-        Invoice invoice = invoiceRepository
-              .findByInvoiceNumber(invoiceNumber)
-              .orElseThrow(() -> new EntityNotFoundException("Invoice not found with invoice number: " + invoiceNumber));
-        return invoiceMapper.toDto(invoice);
+        return getInvoiceByInvoiceNumberQueryHandler.handle(new GetInvoiceByInvoiceNumberQuery(invoiceNumber));
     }
 
+    /**
+     * Create a new invoice.
+     * 
+     * @param invoiceRequestDto The invoice request DTO
+     * @return The created invoice response DTO
+     */
     public InvoiceResponseDto createInvoice(InvoiceRequestDto invoiceRequestDto) {
-        if (invoiceRepository.existsByInvoiceNumber(invoiceRequestDto.getInvoiceNumber())) {
-            throw new IllegalArgumentException("Invoice with number " + invoiceRequestDto.getInvoiceNumber() + " already exists");
-        }
-        Invoice invoice = invoiceMapper.toEntity(invoiceRequestDto);
-        invoice.setAmount(calculateTotalAmount(invoiceRequestDto.getLineItems()));
-        Invoice savedInvoice = invoiceRepository.save(invoice);
-
-        List<LineItem> savedItems = saveItems(invoiceRequestDto.getLineItems(), savedInvoice);
-
-        savedInvoice.setLineItems(savedItems);
-        return invoiceMapper.toDto(savedInvoice);
+        return createInvoiceCommandHandler.handle(new CreateInvoiceCommand(invoiceRequestDto));
     }
 
-    public InvoiceResponseDto updateInvoice(UpdateInvoiceRequestDto invoiceRequestDto) {
-        Invoice invoice = invoiceRepository
-              .findByInvoiceNumber(invoiceRequestDto.getInvoiceNumber())
-              .orElseThrow(() -> new EntityNotFoundException("Invoice not found with number: " + invoiceRequestDto.getInvoiceNumber()));
-
-        // Only update if the invoice number is not changed or the new invoice number doesn't exist
-        if (!invoice.getInvoiceNumber().equals(invoiceRequestDto.getInvoiceNumber()) && invoiceRepository.existsByInvoiceNumber(
-              invoiceRequestDto.getInvoiceNumber())) {
-            throw new IllegalArgumentException("Invoice with number " + invoiceRequestDto.getInvoiceNumber() + " already exists");
-        }
-
-        List<LineItem> items = invoice.getLineItems();
-        List<LineItem> savedItems = saveItems(invoiceRequestDto.getLineItems(), invoice);
-        items.addAll(savedItems);
-
-        invoice.setLineItems(items);
-
-        invoice.setAmount(calculateTotalAmount(items.stream().map(LineItemMapper.INSTANCE::toDto).collect(Collectors.toList())));
-        //invoice.setLineItems(items);
-
-        Invoice updatedInvoice = invoiceRepository.save(invoice);
-        return invoiceMapper.toDto(updatedInvoice);
-    }
-
-    private BigDecimal calculateTotalAmount(List<LineItemRequestDto> items) {
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (LineItemRequestDto item : items) {
-            totalAmount = totalAmount.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-        }
-        return totalAmount;
-    }
-
-    private List<LineItem> saveItems(List<LineItemRequestDto> items, Invoice invoice) {
-
-        return items.stream().map(lineItemDto -> {
-            LineItem lineItem = LineItemMapper.INSTANCE.toEntity(lineItemDto);
-            lineItem.setInvoice(invoice);
-            return lineItemRepository.save(lineItem);
-
-        }).collect(Collectors.toList());
-
+    /**
+     * Update an existing invoice.
+     * 
+     * @param updateInvoiceRequestDto The update invoice request DTO
+     * @return The updated invoice response DTO
+     */
+    public InvoiceResponseDto updateInvoice(UpdateInvoiceRequestDto updateInvoiceRequestDto) {
+        return updateInvoiceCommandHandler.handle(new UpdateInvoiceCommand(updateInvoiceRequestDto));
     }
 }
