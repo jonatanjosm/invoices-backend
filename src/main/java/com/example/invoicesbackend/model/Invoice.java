@@ -39,6 +39,8 @@ public class Invoice {
     @Positive(message = "Amount must be positive")
     private BigDecimal amount;
 
+    private BigDecimal debtAmount;
+
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -47,8 +49,9 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LineItem> lineItems = new ArrayList<>();
 
-    @OneToOne(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Payment payment;
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Transient
+    private List<Payment> payment;
 
     public void addLineItem(LineItem lineItem) {
         lineItems.add(lineItem);
@@ -60,21 +63,13 @@ public class Invoice {
         lineItem.setInvoice(null);
     }
 
-    public void setPayment(Payment payment) {
+    public void setPayment(List<Payment> payment) {
         this.payment = payment;
-        payment.setInvoice(this);
-    }
-
-    public void removePayment() {
-        if (payment != null) {
-            Payment paymentToRemove = this.payment;
-            this.payment = null;
-            paymentToRemove.setInvoice(null);
-        }
+        payment.forEach(p-> p.setInvoiceId(this.id));
     }
 
     public enum InvoiceStatus {
-        PENDING, PAID
+        PENDING, PAID, PARTIALLY_PAID
     }
 
     public void calculateAmount() {

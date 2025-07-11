@@ -20,8 +20,9 @@ public class InvoiceResponseDto {
     private String customerName;
     private LocalDate invoiceDate;
     private BigDecimal amount;
+    private BigDecimal debtAmount;
     private String description;
     private Invoice.InvoiceStatus status;
     private List<LineItemResponseDto> lineItems = new ArrayList<>();
-    private PaymentInfoDto paymentInfo;
+    private List<PaymentInfoDto> paymentInfo;
 }

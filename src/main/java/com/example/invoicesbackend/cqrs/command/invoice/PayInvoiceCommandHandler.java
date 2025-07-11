@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -25,7 +28,7 @@ public class PayInvoiceCommandHandler implements CommandHandler<PayInvoiceComman
     private final InvoiceMapper invoiceMapper;
 
     @Autowired
-    public PayInvoiceCommandHandler(InvoiceRepository invoiceRepository, 
+    public PayInvoiceCommandHandler(InvoiceRepository invoiceRepository,
                                    PaymentRepository paymentRepository,
                                    InvoiceMapper invoiceMapper) {
         this.invoiceRepository = invoiceRepository;
@@ -38,39 +41,51 @@ public class PayInvoiceCommandHandler implements CommandHandler<PayInvoiceComman
     public InvoiceResponseDto handle(PayInvoiceCommand command) {
         String invoiceNumber = command.getPaymentRequestDto().getInvoiceNumber();
         Optional<Invoice> optionalInvoice = invoiceRepository.findByInvoiceNumber(invoiceNumber);
-        
-        if (!optionalInvoice.isPresent()) {
+
+        if (optionalInvoice.isEmpty()) {
             throw new IllegalArgumentException("Invoice with number " + invoiceNumber + " not found");
         }
-        
+
         Invoice invoice = optionalInvoice.get();
-        
+
         // Validate invoice status
-        if (invoice.getStatus() != Invoice.InvoiceStatus.PENDING) {
-            throw new IllegalStateException("Invoice with number " + invoiceNumber + " is not in PENDING status");
+        if (Invoice.InvoiceStatus.PAID.equals(invoice.getStatus())) {
+            throw new IllegalStateException("Invoice with number " + invoiceNumber + " is already PAID");
         }
-        
+
         // Validate payment amount
         BigDecimal paymentAmount = command.getPaymentRequestDto().getAmount();
-        if (paymentAmount.compareTo(invoice.getAmount()) != 0) {
-            throw new IllegalArgumentException("Payment amount " + paymentAmount + 
-                " does not match invoice amount " + invoice.getAmount());
+        if (paymentAmount.compareTo(invoice.getDebtAmount()) > 0) {
+            throw new IllegalArgumentException("Payment amount " + paymentAmount +
+                " it's bigger than invoice amount " + invoice.getAmount());
         }
-        
+
+        BigDecimal newDebtAmount = invoice.getDebtAmount().subtract(paymentAmount);
+        invoice.setDebtAmount(newDebtAmount);
+
+        if(paymentAmount.compareTo(invoice.getDebtAmount()) == 0){
+            invoice.setDebtAmount(BigDecimal.ZERO);
+            invoice.setStatus(Invoice.InvoiceStatus.PAID);
+        } else {
+            invoice.setStatus(Invoice.InvoiceStatus.PARTIALLY_PAID);
+        }
+
+        List<Payment> paymentList = Objects.nonNull(invoice.getPayment()) ?  invoice.getPayment() : new ArrayList<>();
+
         // Create and save payment
         Payment payment = new Payment();
-        payment.setInvoice(invoice);
+        payment.setInvoiceId(invoice.getId());
         payment.setPaymentDate(command.getPaymentRequestDto().getPaymentDate());
         payment.setAmount(paymentAmount);
         payment.setPaymentMethod(command.getPaymentRequestDto().getPaymentMethod());
-        
+
+        paymentList.add(payment);
         // Update invoice status
-        invoice.setStatus(Invoice.InvoiceStatus.PAID);
-        invoice.setPayment(payment);
-        
+        invoice.setPayment(paymentList);
+
         // Save changes
         Invoice savedInvoice = invoiceRepository.save(invoice);
-        
+
         return invoiceMapper.toDto(savedInvoice);
     }
 }

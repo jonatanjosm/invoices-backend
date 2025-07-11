@@ -41,6 +41,7 @@ public class CreateInvoiceCommandHandler implements CommandHandler<CreateInvoice
         
         Invoice invoice = invoiceMapper.toEntity(command.getInvoiceRequestDto());
         invoice.setAmount(calculateTotalAmount(command.getInvoiceRequestDto().getLineItems()));
+        invoice.setDebtAmount(invoice.getAmount());
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
         List<LineItem> savedItems = saveItems(command.getInvoiceRequestDto().getLineItems(), savedInvoice);

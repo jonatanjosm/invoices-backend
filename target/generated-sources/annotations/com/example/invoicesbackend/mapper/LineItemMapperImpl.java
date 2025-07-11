@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-10T12:36:45-0500",
-    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 19.0.2 (Homebrew)"
+    date = "2025-07-11T08:39:25-0500",
+    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.10 (Amazon.com Inc.)"
 )
 @Component
 public class LineItemMapperImpl implements LineItemMapper {

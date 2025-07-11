@@ -5,6 +5,7 @@ CREATE TABLE invoices (
     customer_name VARCHAR(255) NOT NULL,
     invoice_date DATE NOT NULL,
     amount DECIMAL(19, 2) NOT NULL,
+    debt_amount DECIMAL(19, 2) NOT NULL,
     description VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING'
 );

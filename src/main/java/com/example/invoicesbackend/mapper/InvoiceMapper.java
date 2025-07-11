@@ -1,15 +1,22 @@
 package com.example.invoicesbackend.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.mapstruct.AfterMapping;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+
 import com.example.invoicesbackend.dto.request.InvoiceRequestDto;
 import com.example.invoicesbackend.dto.response.InvoiceResponseDto;
 import com.example.invoicesbackend.dto.response.PaymentInfoDto;
 import com.example.invoicesbackend.model.Invoice;
-import com.example.invoicesbackend.model.Payment;
-import org.mapstruct.*;
 
-import java.util.List;
-
-@Mapper(componentModel = "spring", uses = {LineItemMapper.class})
+@Mapper(componentModel = "spring", uses = { LineItemMapper.class })
 public interface InvoiceMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -43,16 +50,20 @@ public interface InvoiceMapper {
         }
     }
 
-    default PaymentInfoDto mapPaymentInfo(Invoice invoice) {
+    default List<PaymentInfoDto> mapPaymentInfo(Invoice invoice) {
         // Only include payment info if the invoice has been paid
         if (invoice != null && Invoice.InvoiceStatus.PAID.equals(invoice.getStatus()) && invoice.getPayment() != null) {
-            Payment payment = invoice.getPayment();
-            PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
-            paymentInfoDto.setId(payment.getId());
-            paymentInfoDto.setPaymentDate(payment.getPaymentDate());
-            paymentInfoDto.setAmount(payment.getAmount());
-            paymentInfoDto.setPaymentMethod(payment.getPaymentMethod());
-            return paymentInfoDto;
+
+            return invoice.getPayment().stream().map(payment -> {
+
+                PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
+                paymentInfoDto.setId(payment.getId());
+                paymentInfoDto.setPaymentDate(payment.getPaymentDate());
+                paymentInfoDto.setAmount(payment.getAmount());
+                paymentInfoDto.setPaymentMethod(payment.getPaymentMethod());
+                return paymentInfoDto;
+            }).collect(Collectors.toList());
+
         }
         return null;
     }
